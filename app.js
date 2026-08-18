@@ -89,7 +89,7 @@ function renderRoutines() {
 
   app.innerHTML = `
     <main class="screen">
-      <header class="topbar"><h1>Workout</h1>${state.activeWorkout ? '<button class="btn btn-primary" data-action="resume-workout">Resume</button>' : ''}</header>
+      <header class="topbar"><div class="suite-heading"><p>Bloody Dave's Suite</p><h1><span>Lift</span> Log</h1><nav aria-label="Bloody Dave's Suite"><a href="https://bloody-recipes.pages.dev">Recipes</a><a class="current" href="#">Lift Log</a></nav></div>${state.activeWorkout ? '<button class="btn btn-primary" data-action="resume-workout">Resume</button>' : ''}</header>
       <div class="content">
         <div class="toolbar">
           <button class="btn" data-action="new-routine">＋ New Routine</button>

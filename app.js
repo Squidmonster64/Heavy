@@ -57,6 +57,7 @@ function render() {
   if (state.view === 'workout') renderWorkout();
   if (state.view === 'recent') renderRecentSessions();
   if (state.view === 'sessionDetail') renderSessionDetail();
+  if (state.view === 'progression') renderProgression();
 }
 
 function renderRoutines() {
@@ -71,14 +72,15 @@ function renderRoutines() {
         <p class="routine-summary">${escapeHtml(summary)}</p>
         <p class="small muted">${routine.exerciseBlocks.length} exercise${routine.exerciseBlocks.length === 1 ? '' : 's'} · ${escapeHtml(lastText)}</p>
         <div class="card-actions">
-          <button class="btn btn-primary" data-action="start-routine" data-id="${routine.id}">Start Routine</button>
+          <button class="btn btn-primary" data-action="start-routine" data-id="${routine.id}">Start routine</button>
           <div class="menu-wrap">
             <button class="btn btn-icon" aria-label="Routine options" data-action="toggle-menu" data-id="${routine.id}">⋯</button>
             ${state.openMenuId === routine.id ? `
               <div class="menu">
                 <button data-action="edit-routine" data-id="${routine.id}">Edit</button>
                 <button data-action="duplicate-routine" data-id="${routine.id}">Duplicate</button>
-                <button data-action="recent-sessions" data-id="${routine.id}">Recent Sessions</button>
+                <button data-action="recent-sessions" data-id="${routine.id}">Recent sessions</button>
+                <button data-action="progression" data-id="${routine.id}">Progression</button>
                 <button data-action="export-routine" data-id="${routine.id}">Export</button>
                 <button class="btn-danger" data-action="delete-routine" data-id="${routine.id}">Delete</button>
               </div>` : ''}
@@ -87,15 +89,19 @@ function renderRoutines() {
       </article>`;
   }).join('');
 
+  const latest = state.sessions.filter(session => session.status === 'completed').sort((a, b) => String(b.completedAt).localeCompare(String(a.completedAt)))[0];
   app.innerHTML = `
     <main class="screen">
       <header class="topbar"><div class="suite-heading"><p>Bloody Dave's Suite</p><h1><span>Lift</span> Log</h1><nav aria-label="Bloody Dave's Suite"><a href="https://recipes.bloodydaves.com">Recipes</a><a href="https://fragments.bloodydaves.com">Fragments</a><a href="https://timer.bloodydaves.com">Quiet Timer</a><a href="https://list.bloodydaves.com">Get List</a><a class="current" href="#">Lift Log</a></nav></div>${state.activeWorkout ? '<button class="btn btn-primary" data-action="resume-workout">Resume</button>' : ''}</header>
       <div class="content">
         <div class="toolbar">
+          ${latest ? `<button class="btn btn-primary" data-action="start-last" data-id="${latest.routineId}">Start last: ${escapeHtml(latest.routineName || 'routine')}</button>` : ''}
           <button class="btn" data-action="new-routine">＋ New Routine</button>
           <button class="btn" data-action="open-library">⌕ Exercise Library</button>
           <button class="btn" data-action="import-file">Import</button>
           <button class="btn" data-action="export-all">Export</button>
+          <button class="btn" data-action="export-encrypted">Encrypted backup</button>
+          <button class="btn" data-action="import-encrypted">Restore encrypted</button>
         </div>
         <div class="section-heading"><h2>My Routines (${state.routines.length})</h2></div>
         ${cards || `
@@ -146,6 +152,22 @@ function renderRecentSessions() {
               </section>`}
         </div>
       </div>
+    </main>`;
+  bindActions();
+}
+
+function renderProgression() {
+  const routine = state.routines.find(item => item.id === state.selectedRoutineId);
+  if (!routine) { state.view = 'routines'; return render(); }
+  const sessions = recentSessionsForRoutine(routine.id).slice().reverse();
+  const volumes = sessions.map(session => Number(session.totalVolumeKg ?? calculateVolume(session)) || 0);
+  const max = Math.max(...volumes, 1);
+  app.innerHTML = `
+    <main class="screen">
+      <header class="topbar"><button class="btn btn-icon" aria-label="Back" data-action="back-routines">‹</button><h1 class="compact-title">Progression</h1></header>
+      <div class="content"><section class="session-routine-head"><h2>${escapeHtml(routine.name)}</h2><p class="muted">Volume across the retained local sessions.</p></section>
+      <section class="card progression-card">${sessions.length ? sessions.map((session, index) => `<div class="progress-row"><span>${escapeHtml(formatDate(session.completedAt))}</span><div class="progress-bar"><i style="width:${Math.max(4, Math.round((volumes[index] / max) * 100))}%"></i></div><strong>${escapeHtml(formatNumber(volumes[index]))} kg</strong></div>`).join('') : '<p class="muted">Complete a workout to see local progression.</p>'}</section>
+      <section class="card"><h2>Repeat well</h2><p class="muted">Start last opens this routine with the most recent completed weight and rep values already filled. Adjust them before completing each set.</p></section></div>
     </main>`;
   bindActions();
 }
@@ -379,9 +401,13 @@ async function handleAction({ action, id, value }) {
     case 'duplicate-routine': return duplicateRoutine(id);
     case 'delete-routine': return deleteRoutine(id);
     case 'recent-sessions': return openRecentSessions(id);
+    case 'progression': state.selectedRoutineId = id; state.view = 'progression'; return render();
+    case 'start-last': return startRoutine(id);
     case 'export-routine': return exportRoutines([id]);
     case 'export-all': return exportRoutines(state.routines.map(r => r.id));
+    case 'export-encrypted': return exportEncryptedBackup();
     case 'import-file': return importFromFile();
+    case 'import-encrypted': return importFromFile(true);
     case 'view-session': return openSessionDetail(id);
     case 'back-recent': state.view = 'recent'; return render();
     case 'start-routine': return startRoutine(id);
@@ -941,6 +967,50 @@ async function cancelWorkout() {
 
 
 
+function bytesToBase64(bytes) { return btoa(String.fromCharCode(...bytes)); }
+function base64ToBytes(value) { return Uint8Array.from(atob(value), character => character.charCodeAt(0)); }
+
+async function backupKey(password, salt) {
+  const material = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 210000, hash: 'SHA-256' }, material, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+
+function makeBackupEnvelope(includeHistory = true) {
+  const referencedExerciseIds = new Set();
+  state.routines.forEach(routine => routine.exerciseBlocks.forEach(block => referencedExerciseIds.add(block.exerciseId)));
+  const exercises = state.exercises.filter(exercise => referencedExerciseIds.has(exercise.id) || exercise.isCustom).map(exercise => ({ ...structuredClone(exercise) }));
+  return { format: 'workout-pwa-export', schemaVersion: 1, appVersion: 'bloody-daves-lift-log', exportedAt: new Date().toISOString(), includesRecentHistory: includeHistory, exercises, routines: state.routines.map(routine => structuredClone(routine)), sessions: includeHistory ? state.sessions.filter(session => session.status === 'completed').map(session => structuredClone(session)) : [] };
+}
+
+async function exportEncryptedBackup() {
+  if (!crypto.subtle) return alert('This browser does not provide the cryptography needed for an encrypted backup.');
+  const password = prompt('Create a backup password. It is not stored anywhere; losing it means the backup cannot be restored.');
+  if (!password) return;
+  const verify = prompt('Confirm the backup password.');
+  if (password !== verify) return alert('Passwords did not match. No backup was created.');
+  const includeHistory = confirm('Include retained local session history in this encrypted backup?');
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await backupKey(password, salt);
+  const payload = new TextEncoder().encode(JSON.stringify(makeBackupEnvelope(includeHistory)));
+  const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, payload));
+  const encrypted = { format: 'bloody-daves/encrypted-lift-log-backup/v1', createdAt: new Date().toISOString(), kdf: { name: 'PBKDF2', hash: 'SHA-256', iterations: 210000, salt: bytesToBase64(salt) }, cipher: { name: 'AES-GCM', iv: bytesToBase64(iv), data: bytesToBase64(ciphertext) } };
+  const blob = new Blob([JSON.stringify(encrypted, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob); const anchor = document.createElement('a'); anchor.href = url; anchor.download = `bloody-daves-lift-log-encrypted-${new Date().toISOString().slice(0, 10)}.json`; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('Encrypted backup exported. Keep the password separately.');
+}
+
+async function decryptBackup(envelope) {
+  if (envelope?.format !== 'bloody-daves/encrypted-lift-log-backup/v1') throw new Error('This is not an encrypted Lift Log backup.');
+  const password = prompt('Enter the password for this encrypted backup.');
+  if (!password) throw new Error('Restore cancelled.');
+  try {
+    const key = await backupKey(password, base64ToBytes(envelope.kdf.salt));
+    const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: base64ToBytes(envelope.cipher.iv) }, key, base64ToBytes(envelope.cipher.data));
+    return JSON.parse(new TextDecoder().decode(plaintext));
+  } catch { throw new Error('The password is incorrect or this backup is damaged.'); }
+}
+
 async function exportRoutines(routineIds) {
   const selected = state.routines.filter(routine => routineIds.includes(routine.id));
   if (!selected.length) return alert('No routines selected for export.');
@@ -1000,7 +1070,7 @@ async function exportRoutines(routineIds) {
   render();
 }
 
-function importFromFile() {
+function importFromFile(encryptedOnly = false) {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'application/json,.json';
@@ -1009,7 +1079,8 @@ function importFromFile() {
     if (!file) return;
     try {
       const text = await file.text();
-      const envelope = JSON.parse(text);
+      let envelope = JSON.parse(text);
+      if (encryptedOnly || envelope?.format === 'bloody-daves/encrypted-lift-log-backup/v1') envelope = await decryptBackup(envelope);
       await importEnvelope(envelope);
     } catch (error) {
       alert(`Import failed: ${error?.message || 'Invalid file.'}`);

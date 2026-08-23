@@ -1,5 +1,15 @@
 :root {
   color-scheme: light;
+  --hj-space-1: .35rem;
+  --hj-space-2: .7rem;
+  --hj-space-3: 1.1rem;
+  --hj-radius: .85rem;
+  --hj-shadow: 0 16px 38px rgba(39, 51, 29, .09);
+  --hj-status-local: #6b5a2e;
+  --hj-status-uploading: #3d5a7a;
+  --hj-status-synced: #2f5a3a;
+  --hj-status-retry: #7a3d2f;
+  --hj-status-error: #9d321d;
   --bg: #f7f8fb;
   --surface: #ffffff;
   --surface-soft: #f0f2f6;
@@ -90,6 +100,13 @@ button { cursor: pointer; }
 .dialog-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
 
 .badge { display: inline-flex; align-items: center; min-height: 26px; border-radius: 999px; padding: 0 9px; background: var(--surface-soft); color: var(--muted); font-size: 12px; font-weight: 700; }
+.hj-status { display: inline-block; padding: .18rem .55rem; border-radius: 99px; font-size: .78rem; font-weight: 750; }
+.hj-status.local { background: #f3ebd2; color: var(--hj-status-local); }
+.hj-status.synced { background: #e4f0de; color: var(--hj-status-synced); }
+.hj-status.retry { background: #fee2d6; color: var(--hj-status-retry); }
+.hj-loading, .hj-offline { color: var(--muted); font-size: .9rem; }
+.hj-error { color: var(--hj-status-error); font-weight: 650; }
+.hj-confirm { font-weight: 750; }
 .toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom)); z-index: 200; transform: translateX(-50%) translateY(30px); opacity: 0; pointer-events: none; background: var(--text); color: white; padding: 12px 16px; border-radius: 12px; transition: .2s ease; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 

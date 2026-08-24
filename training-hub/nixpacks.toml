@@ -6,6 +6,7 @@ providers = ["node"]
 [variables]
 NIXPACKS_NODE_VERSION = "22"
 NPM_CONFIG_PRODUCTION = "false"
+TZ = "Australia/Perth"
 
 [phases.setup]
 nixPkgs = ["...", "openssl"]

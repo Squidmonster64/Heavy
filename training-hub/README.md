@@ -15,13 +15,13 @@ This is not an AI coaching engine.
 ```bash
 cd training-hub
 cp .env.example .env
-# set DATABASE_URL, APP_PASSCODE, INTERVALS_API_KEY, INTERVALS_ATHLETE_ID
+# set DATABASE_URL, APP_PASSCODE, INTERVALS_ATHLETE_ID
 npx prisma migrate deploy
 npx prisma db seed
 npm run dev
 ```
 
-Timezone: `Australia/Perth`.
+Timezone: `Australia/Perth`. `INTERVALS_API_KEY` is optional until Intervals sync is enabled.
 
 ## Railway (new service only)
 
@@ -29,34 +29,45 @@ Create a **new** Railway project/service, not the Lift Log service.
 
 This folder is self-contained for Nixpacks (`railway.json`, `nixpacks.toml`, lockfile). Do not add Railway/Nixpacks config at the repository root — that would change Lift Log.
 
-1. Root directory: `training-hub` (required; otherwise Railway uses the Lift Log `package.json` at the repo root)
-2. Watch branch: `feature/training-hub-v1` until this is merged
-3. New PostgreSQL plugin / database (do not reuse Lift Log)
-4. Environment variables:
+| Setting | Value |
+|---|---|
+| Project | Adaptive Fitness Training Hub |
+| Service | `training-hub` |
+| Branch | `feature/training-hub-v1` |
+| Root directory | `training-hub` |
+| Build command | `npm run build` |
+| Start command | `npx prisma migrate deploy && npm run start` |
+| Healthcheck | `GET /api/health` |
+| Healthcheck timeout | 300 seconds |
+
+Root directory is required. Without it Railway uses the Lift Log `package.json` at the repo root.
+
+Use a **new** PostgreSQL database. Do not reuse the Lift Log database.
+
+Required env:
 
 ```
 DATABASE_URL=
 APP_PASSCODE=
-INTERVALS_API_KEY=
 INTERVALS_ATHLETE_ID=i568864
 TZ=Australia/Perth
 ```
 
-`railway.json` already sets:
+Optional for now:
 
-- Build: `npm run build` (`prisma generate` then `next build`)
-- Start: `npx prisma migrate deploy && npm run start`
-- Healthcheck: `GET /api/health` (public; does not check the database)
+```
+INTERVALS_API_KEY=
+```
 
-Do **not** run `prisma migrate deploy` during build. Railway private Postgres is often unreachable from the build machine.
+`railway.json` already sets build, start, healthcheck path, and the 300s timeout. Do **not** run `prisma migrate deploy` during build. Railway private Postgres is often unreachable from the build machine.
 
-Seed once after first successful deploy:
+After the first successful deploy only:
 
 ```
 npx prisma db seed
 ```
 
-Replace any previously used Intervals API key before production.
+Do not point this service at `main`, merge PR #4, or change the existing Lift Log Railway service.
 
 ## Branch
 

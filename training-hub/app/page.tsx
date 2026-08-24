@@ -1,4 +1,5 @@
 import { Shell } from "./shell";
+import { SessionCard } from "./session-card";
 import { SymptomFlags } from "./symptom-flags";
 import { prisma } from "@/lib/db";
 import { addDays, dateKeyFromStored, formatAthleteLong, formatDateTimeAthlete, todayAthleteDateKey } from "@/lib/dates";

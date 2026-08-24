@@ -27,24 +27,30 @@ Timezone: `Australia/Perth`.
 
 Create a **new** Railway project/service, not the Lift Log service.
 
-1. Root directory: `training-hub`
-2. New PostgreSQL plugin / database
-3. Environment variables:
+This folder is self-contained for Nixpacks (`railway.json`, `nixpacks.toml`, lockfile). Do not add Railway/Nixpacks config at the repository root — that would change Lift Log.
+
+1. Root directory: `training-hub` (required; otherwise Railway uses the Lift Log `package.json` at the repo root)
+2. Watch branch: `feature/training-hub-v1` until this is merged
+3. New PostgreSQL plugin / database (do not reuse Lift Log)
+4. Environment variables:
 
 ```
 DATABASE_URL=
 APP_PASSCODE=
 INTERVALS_API_KEY=
 INTERVALS_ATHLETE_ID=i568864
+TZ=Australia/Perth
 ```
 
-Start command (also in `railway.json`):
+`railway.json` already sets:
 
-```
-npx prisma migrate deploy && npm start
-```
+- Build: `npm run build` (`prisma generate` then `next build`)
+- Start: `npx prisma migrate deploy && npm run start`
+- Healthcheck: `GET /api/health` (public; does not check the database)
 
-Seed once after first deploy:
+Do **not** run `prisma migrate deploy` during build. Railway private Postgres is often unreachable from the build machine.
+
+Seed once after first successful deploy:
 
 ```
 npx prisma db seed

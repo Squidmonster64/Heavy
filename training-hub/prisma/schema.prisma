@@ -1,0 +1,156 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Modality {
+  REHAB
+  STRENGTH
+  RUN
+  CYCLE
+}
+
+enum SessionStatus {
+  PLANNED
+  COMPLETED
+  SKIPPED
+  CANCELLED
+}
+
+enum MatchStatus {
+  UNMATCHED
+  AUTO_MATCHED
+  MANUAL_MATCHED
+  AMBIGUOUS
+}
+
+model Program {
+  id         String              @id @default(cuid())
+  name       String
+  startDate  DateTime            @db.Date
+  endDate    DateTime?           @db.Date
+  active     Boolean             @default(true)
+  taperStart DateTime?           @db.Date
+  raceDate   DateTime?           @db.Date
+  config     Json
+  days       ProgramDay[]
+  sessions   ScheduledSession[]
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+}
+
+model ProgramDay {
+  id         String           @id @default(cuid())
+  programId  String
+  program    Program          @relation(fields: [programId], references: [id], onDelete: Cascade)
+  dayOfWeek  Int
+  modality   Modality
+  templateId String?
+  template   SessionTemplate? @relation(fields: [templateId], references: [id])
+}
+
+model SessionTemplate {
+  id          String       @id @default(cuid())
+  modality    Modality
+  name        String
+  structure   Json
+  programDays ProgramDay[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model ScheduledSession {
+  id                   String                   @id @default(cuid())
+  programId            String
+  program              Program                  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  date                 DateTime                 @db.Date
+  modality             Modality
+  templateId           String?
+  templateName         String?
+  plannedStructure     Json
+  originalStructure    Json?
+  status               SessionStatus            @default(PLANNED)
+  intervalsExternalId  String                   @unique
+  intervalsEventId     String?
+  intervalsActivityId  String?
+  matchStatus          MatchStatus              @default(UNMATCHED)
+  matchConfidence      Float?
+  notes                String?
+  exportLog            Json?
+  completion           Json?
+  matchCandidates      ActivityMatchCandidate[]
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+
+  @@unique([programId, date, modality, templateId])
+  @@index([date])
+  @@index([status])
+}
+
+model ActivityMatchCandidate {
+  id                 String           @id @default(cuid())
+  scheduledSessionId String
+  scheduledSession   ScheduledSession @relation(fields: [scheduledSessionId], references: [id], onDelete: Cascade)
+  intervalsActivityId String
+  confidence         Float
+  detail             Json
+  createdAt          DateTime         @default(now())
+
+  @@unique([scheduledSessionId, intervalsActivityId])
+}
+
+model PulledActivity {
+  id                  String   @id @default(cuid())
+  intervalsActivityId String   @unique
+  date                DateTime @db.Date
+  type                String
+  name                String?
+  durationSec         Float?
+  distanceM           Float?
+  startTime           DateTime?
+  load                Float?
+  summary             Json
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([date])
+}
+
+model ExerciseLibrary {
+  id           String  @id @default(cuid())
+  name         String
+  family       String
+  equipment    String?
+  kneeFlag     String?
+  shoulderFlag String?
+  spineFlag    String?
+  cues         String?
+}
+
+model WellnessSnapshot {
+  id        String   @id @default(cuid())
+  date      DateTime @unique @db.Date
+  source    String   @default("intervals.icu")
+  raw       Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SyncLog {
+  id         String   @id @default(cuid())
+  timestamp  DateTime @default(now())
+  direction  String
+  entityType String
+  status     String
+  detail     String?
+}
+
+model Setting {
+  key   String @id
+  value String
+}

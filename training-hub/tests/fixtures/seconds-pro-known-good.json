@@ -1,0 +1,21 @@
+{
+  "name": "Nerve Glide — Stage 1",
+  "type": 3,
+  "soundScheme": 8,
+  "via": "web",
+  "numberOfSets": "1",
+  "intervals": [
+    {
+      "type": 0,
+      "name": "Nerve glide",
+      "duration": 45,
+      "color": 0
+    },
+    {
+      "type": 1,
+      "name": "Rest",
+      "duration": 30,
+      "color": "1"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "format": "workout-pwa-export",
+  "schemaVersion": 1,
+  "appVersion": "bloody-daves-lift-log",
+  "exportedAt": "2026-08-24T00:00:00.000Z",
+  "includesRecentHistory": false,
+  "exercises": [
+    {
+      "id": "barbell-bench-press",
+      "name": "Barbell Bench Press",
+      "normalizedName": "barbell bench press",
+      "equipment": "barbell",
+      "bodyArea": "push",
+      "isBodyweight": false,
+      "aliases": [],
+      "isCustom": false,
+      "isArchived": false,
+      "createdAt": "2026-07-21T00:00:00.000Z",
+      "updatedAt": "2026-07-21T00:00:00.000Z"
+    }
+  ],
+  "routines": [
+    {
+      "id": "fixture-push-a",
+      "name": "Push A",
+      "tag": "",
+      "notes": "",
+      "exerciseBlocks": [
+        {
+          "id": "block-1",
+          "exerciseId": "barbell-bench-press",
+          "order": 0,
+          "notes": "",
+          "sets": [
+            { "id": "set-1", "setNumber": 1, "targetWeightKg": 60, "targetReps": 8 },
+            { "id": "set-2", "setNumber": 2, "targetWeightKg": 60, "targetReps": 8 },
+            { "id": "set-3", "setNumber": 3, "targetWeightKg": 60, "targetReps": 8 }
+          ]
+        }
+      ],
+      "createdAt": "2026-08-24T00:00:00.000Z",
+      "updatedAt": "2026-08-24T00:00:00.000Z"
+    }
+  ],
+  "sessions": []
+}

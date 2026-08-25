@@ -1,0 +1,21 @@
+# Training Hub service only. Railway Root Directory must be `training-hub`.
+# Do not add a repo-root nixpacks.toml — that would change Lift Log.
+
+providers = ["node"]
+
+[variables]
+NIXPACKS_NODE_VERSION = "22"
+NPM_CONFIG_PRODUCTION = "false"
+TZ = "Australia/Perth"
+
+[phases.setup]
+nixPkgs = ["...", "openssl"]
+
+[phases.install]
+cmds = ["npm ci --include=dev"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npx prisma migrate deploy && npm run start"

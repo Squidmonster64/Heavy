@@ -30,7 +30,6 @@ jobs:
         working-directory: training-hub
     env:
       DATABASE_URL: postgresql://user:pass@localhost:5432/training_hub
-      APP_PASSCODE: test-passcode
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

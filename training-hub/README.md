@@ -15,7 +15,7 @@ This is not an AI coaching engine.
 ```bash
 cd training-hub
 cp .env.example .env
-# set DATABASE_URL, APP_PASSCODE, INTERVALS_ATHLETE_ID
+# set DATABASE_URL and INTERVALS_ATHLETE_ID
 npx prisma migrate deploy
 npx prisma db seed
 npm run dev
@@ -48,7 +48,6 @@ Required env:
 
 ```
 DATABASE_URL=
-APP_PASSCODE=
 INTERVALS_ATHLETE_ID=i568864
 TZ=Australia/Perth
 ```

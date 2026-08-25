@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { unauthorizedIfNeeded } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { addDays, dateKeyFromStored, todayAthleteDateKey } from "@/lib/dates";
 import { buildCoachContext } from "@/lib/coach/context";
@@ -7,8 +6,6 @@ import { SETTING_KEYS, getSettingsMap } from "@/lib/settings";
 import { getActiveProgram } from "@/lib/program/service";
 
 export async function GET() {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const today = todayAthleteDateKey();
   const program = await getActiveProgram();
   const sessions = await prisma.scheduledSession.findMany({

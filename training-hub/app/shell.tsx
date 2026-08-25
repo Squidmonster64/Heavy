@@ -16,9 +16,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <p className="kicker">Adaptive Fitness</p>
           <h1 className="m-0 text-2xl font-semibold tracking-tight">Training Hub</h1>
         </div>
-        <form action="/api/auth/logout" method="post">
-          <button className="btn btn-quiet" type="submit">Sign out</button>
-        </form>
       </header>
       <nav className="mb-6 flex flex-wrap gap-2 border-b border-[var(--line)] pb-3 font-sans text-sm">
         {NAV.map((item) => (

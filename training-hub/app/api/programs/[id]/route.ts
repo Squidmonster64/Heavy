@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fail, unauthorizedIfNeeded } from "@/lib/api";
+import { fail } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { parseAthleteDate } from "@/lib/dates";
 import { generateProgramSessions } from "@/lib/program/service";
@@ -7,8 +7,6 @@ import { generateProgramSessions } from "@/lib/program/service";
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_: NextRequest, { params }: Params) {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const { id } = await params;
   const program = await prisma.program.findUnique({ where: { id }, include: { days: true } });
   if (!program) return fail(404, "Program not found");
@@ -16,8 +14,6 @@ export async function GET(_: NextRequest, { params }: Params) {
 }
 
 export async function PATCH(request: NextRequest, { params }: Params) {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const { id } = await params;
   const body = await request.json().catch(() => ({}));
   const program = await prisma.program.update({

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { unauthorizedIfNeeded } from "@/lib/api";
 import { SETTING_KEYS, athleteIdFromEnvOrSettings, getSettingsMap, setSetting } from "@/lib/settings";
 import { getIntervalsCredentials } from "@/lib/intervals/client";
 
@@ -16,8 +15,6 @@ import { getIntervalsCredentials } from "@/lib/intervals/client";
 ]);
 
 export async function GET() {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const settings = await getSettingsMap(Object.values(SETTING_KEYS));
   return NextResponse.json({
     intervalsConfigured: Boolean(getIntervalsCredentials()),
@@ -37,8 +34,6 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const body = await request.json().catch(() => ({}));
   for (const [key, value] of Object.entries(body)) {
     const mapped = (SETTING_KEYS as Record<string, string>)[key] ?? key;

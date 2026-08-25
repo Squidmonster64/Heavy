@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fail, unauthorizedIfNeeded } from "@/lib/api";
+import { fail } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { parseStructure } from "@/lib/validation/structures";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: NextRequest, { params }: Params) {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const { id } = await params;
   const existing = await prisma.sessionTemplate.findUnique({ where: { id } });
   if (!existing) return fail(404, "Template not found");

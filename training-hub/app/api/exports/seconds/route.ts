@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fail, unauthorizedIfNeeded } from "@/lib/api";
+import { fail } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { encodeSecondsPro } from "@/lib/export/secondsPro";
 import { parseStructure } from "@/lib/validation/structures";
 
 export async function GET(request: NextRequest) {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const sessionId = request.nextUrl.searchParams.get("sessionId");
   if (!sessionId) return fail(400, "sessionId is required");
   const session = await prisma.scheduledSession.findUnique({ where: { id: sessionId } });

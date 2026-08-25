@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fail, unauthorizedIfNeeded } from "@/lib/api";
+import { fail } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { DEFAULT_PROGRAM_CONFIG } from "@/lib/config";
 import { parseAthleteDate } from "@/lib/dates";
 import { generateProgramSessions } from "@/lib/program/service";
 
 export async function GET() {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const programs = await prisma.program.findMany({ include: { days: true }, orderBy: { createdAt: "desc" } });
   return NextResponse.json({ programs });
 }
 
 export async function POST(request: NextRequest) {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const body = await request.json().catch(() => ({}));
   if (!body.name || !body.startDate) return fail(400, "name and startDate are required");
   const program = await prisma.program.create({

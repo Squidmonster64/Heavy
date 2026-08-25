@@ -1,6 +1,6 @@
 import { MatchStatus, SessionStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { fail, unauthorizedIfNeeded } from "@/lib/api";
+import { fail } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { parseAthleteDate } from "@/lib/dates";
 import { parseStructure } from "@/lib/validation/structures";
@@ -11,8 +11,6 @@ import { externalIdForSession } from "@/lib/intervals/client";
 import { createId } from "@/lib/program/id";
 
 export async function GET(request: NextRequest) {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const from = request.nextUrl.searchParams.get("from");
   const to = request.nextUrl.searchParams.get("to");
   const sessions = await prisma.scheduledSession.findMany({
@@ -32,8 +30,6 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const body = await request.json().catch(() => ({}));
   const program = await prisma.program.findFirst({ where: { active: true }, orderBy: { createdAt: "desc" } });
   if (!program) return fail(400, "No active program");
@@ -58,8 +54,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const body = await request.json().catch(() => ({}));
   const id = String(body.id ?? "");
   const session = await prisma.scheduledSession.findUnique({ where: { id } });

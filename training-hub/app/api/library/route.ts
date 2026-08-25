@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { unauthorizedIfNeeded } from "@/lib/api";
 import { prisma } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
-  const denied = await unauthorizedIfNeeded();
-  if (denied) return denied;
   const { searchParams } = request.nextUrl;
   const modality = searchParams.get("modality");
   const equipment = searchParams.get("equipment");

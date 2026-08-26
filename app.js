@@ -22,6 +22,8 @@ const equipmentLabels = {
   all: 'All', bodyweight: 'Bodyweight', dumbbell: 'Dumbbell', kettlebell: 'Kettlebell',
   barbell: 'Barbell', cable: 'Cable', machine: 'Machine', band: 'Bands', other: 'Other'
 };
+const FAMILY_CONTROL_HREF = 'https://control.bloodydaves.com';
+const compactControlLink = `<a class="family-control compact-control" href="${FAMILY_CONTROL_HREF}">Control</a>`;
 
 start().catch(handleFatalError);
 
@@ -92,7 +94,7 @@ function renderRoutines() {
   const latest = state.sessions.filter(session => session.status === 'completed').sort((a, b) => String(b.completedAt).localeCompare(String(a.completedAt)))[0];
   app.innerHTML = `
     <main class="screen">
-      <header class="topbar"><div class="suite-heading"><p>Bloody Dave's Suite</p><h1><span>Lift</span> Log</h1><nav aria-label="Bloody Dave's Suite"><a href="https://recipes.bloodydaves.com">Recipes</a><a href="https://fragments.bloodydaves.com">Fragments</a><a href="https://timer.bloodydaves.com">Quiet Timer</a><a href="https://list.bloodydaves.com">Get List</a><a class="current" href="#">Lift Log</a></nav></div>${state.activeWorkout ? '<button class="btn btn-primary" data-action="resume-workout">Resume</button>' : ''}</header>
+      <header class="topbar"><div class="suite-heading"><p><a class="family-control" href="${FAMILY_CONTROL_HREF}">Bloody Dave's</a></p><h1><span>Lift</span> Log</h1><nav aria-label="Bloody Dave's Suite"><a href="https://recipes.bloodydaves.com">Recipes</a><a href="https://fragments.bloodydaves.com">Fragments</a><a href="https://timer.bloodydaves.com">Quiet Timer</a><a href="https://list.bloodydaves.com">Get List</a><a class="current" href="#">Lift Log</a></nav></div>${state.activeWorkout ? '<button class="btn btn-primary" data-action="resume-workout">Resume</button>' : ''}</header>
       <div class="content">
         <div class="toolbar">
           ${latest ? `<button class="btn btn-primary" data-action="start-last" data-id="${latest.routineId}">Start last: ${escapeHtml(latest.routineName || 'routine')}</button>` : ''}
@@ -130,6 +132,7 @@ function renderRecentSessions() {
     <main class="screen">
       <header class="topbar">
         <button class="btn btn-icon" aria-label="Back" data-action="back-routines">‹</button>
+        ${compactControlLink}
         <h1 class="compact-title">Recent Sessions</h1>
       </header>
       <div class="content">
@@ -164,7 +167,7 @@ function renderProgression() {
   const max = Math.max(...volumes, 1);
   app.innerHTML = `
     <main class="screen">
-      <header class="topbar"><button class="btn btn-icon" aria-label="Back" data-action="back-routines">‹</button><h1 class="compact-title">Progression</h1></header>
+      <header class="topbar"><button class="btn btn-icon" aria-label="Back" data-action="back-routines">‹</button>${compactControlLink}<h1 class="compact-title">Progression</h1></header>
       <div class="content"><section class="session-routine-head"><h2>${escapeHtml(routine.name)}</h2><p class="muted">Volume across the retained local sessions.</p></section>
       <section class="card progression-card">${sessions.length ? sessions.map((session, index) => `<div class="progress-row"><span>${escapeHtml(formatDate(session.completedAt))}</span><div class="progress-bar"><i style="width:${Math.max(4, Math.round((volumes[index] / max) * 100))}%"></i></div><strong>${escapeHtml(formatNumber(volumes[index]))} kg</strong></div>`).join('') : '<p class="muted">Complete a workout to see local progression.</p>'}</section>
       <section class="card"><h2>Repeat well</h2><p class="muted">Start last opens this routine with the most recent completed weight and rep values already filled. Adjust them before completing each set.</p></section></div>
@@ -179,6 +182,7 @@ function renderSessionDetail() {
     <main class="screen">
       <header class="topbar">
         <button class="btn btn-icon" aria-label="Back" data-action="back-recent">‹</button>
+        ${compactControlLink}
         <div class="workout-title"><h1 class="compact-title">${escapeHtml(session.routineName || 'Session')}</h1><span class="small muted">${escapeHtml(formatDateTime(session.completedAt || session.updatedAt))}</span></div>
       </header>
       <div class="workout-summary">
@@ -306,6 +310,7 @@ function renderBuilder() {
     <main class="screen">
       <header class="topbar">
         <button class="btn btn-icon" aria-label="Back" data-action="back-routines">‹</button>
+        ${compactControlLink}
         <h1 class="compact-title">${routine.persisted ? 'Edit Routine' : 'New Routine'}</h1>
         <button class="btn btn-primary" data-action="save-routine">Save</button>
       </header>
@@ -353,6 +358,7 @@ function renderLibrary() {
     <main class="screen">
       <header class="topbar">
         <button class="btn btn-icon" aria-label="Back" data-action="library-back">‹</button>
+        ${compactControlLink}
         <h1 class="compact-title">Exercise Library</h1>
         <button class="btn btn-link" data-action="custom-exercise">Custom</button>
       </header>
@@ -850,6 +856,7 @@ function renderWorkout() {
     <main class="screen">
       <header class="topbar workout-topbar">
         <button class="btn btn-icon" aria-label="Back to routines" data-action="back-from-workout">‹</button>
+        ${compactControlLink}
         <div class="workout-title"><h1 class="compact-title">${escapeHtml(workout.routineName)}</h1><span class="small muted">Autosaved locally</span></div>
         <button class="btn btn-primary" data-action="finish-workout">Finish</button>
       </header>

@@ -45,6 +45,8 @@ test('logging controls stay touch-safe at 40–48px and numbers lead decoration'
 test('viewport gates keep a single column with no horizontal overflow', () => {
   assert.match(css, /Viewport gates: 390×844, 768×1024, 1024×768, 820×1180, 1180×820, 1440×900/);
   assert.match(css, /overflow-x: hidden/);
+  assert.match(css, /\.workout-set-grid > \* \{[\s\S]*min-width: 0;/);
+  assert.match(css, /input\[type='number'\]/);
   assert.match(css, /@media \(max-width: 390px\)/);
   assert.match(css, /@media \(min-width: 768px\) and \(max-width: 1024px\)/);
   assert.match(css, /@media \(min-width: 1024px\)/);

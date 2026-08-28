@@ -793,7 +793,7 @@ function renderWorkoutExercise(exercise, nextSetId, labelPrefix = '') {
   return `
     <section class="workout-exercise card ${labelPrefix ? 'inside-superset' : ''}">
       <div class="workout-exercise-head"><div><h2>${labelPrefix ? `<span class="superset-prefix">${escapeHtml(labelPrefix)}</span> ` : ''}${escapeHtml(exercise.exerciseName)}</h2>${exercise.notes ? `<p>${escapeHtml(exercise.notes)}</p>` : ''}</div><button class="mini-btn" data-action="add-workout-set" data-id="${exercise.id}">＋ Set</button></div>
-      <div class="workout-set-grid workout-set-head"><span>Set</span><span>Prev</span><span>kg</span><span>Reps</span><span>Log</span></div>
+      <div class="workout-set-grid workout-set-head"><span>Set</span><span>Prev</span><span>kg</span><span>Reps</span><span>Log</span><span></span></div>
       ${exercise.sets.map((set, setIndex) => `
         <div class="workout-set-grid ${set.isCompleted ? 'completed' : ''} ${set.id === nextSetId ? 'next-set' : ''}" data-set-id="${set.id}">
           <span class="set-number">${setIndex + 1}</span>

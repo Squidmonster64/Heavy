@@ -1,0 +1,187 @@
+/* Canonical Suite UI Recovery — Lift Log (Bloody Dave's, page 12).
+   Tokens match Control family-bd / control-recovery.css.
+   Viewport gates: 390×844, 768×1024, 1024×768, 820×1180, 1180×820, 1440×900. */
+
+:root {
+  --recovery-bd-bg: #152018;
+  --recovery-bd-surface: #1d2a20;
+  --recovery-bd-border: #35463a;
+  --recovery-bd-text: #f2efe7;
+  --recovery-bd-muted: #a7aa9e;
+  --recovery-orange: #ef7c35;
+  --recovery-sand: #d7bd7c;
+}
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+  background: var(--recovery-bd-bg);
+  color: var(--recovery-bd-text);
+}
+
+.lift-suite,
+.lift-recovery {
+  background: var(--recovery-bd-bg);
+  color: var(--recovery-bd-text);
+}
+
+.lift-topbar {
+  min-height: 58px;
+  max-height: none;
+}
+
+.suite-heading {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  line-height: 1;
+}
+
+.suite-heading .family-control,
+.family-control {
+  color: var(--recovery-orange);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.suite-heading .app-name,
+.topbar .app-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--recovery-bd-text);
+}
+
+.compact-control {
+  color: var(--recovery-orange);
+}
+
+.routine-metrics {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.routine-metrics strong {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--recovery-bd-text);
+  line-height: 1;
+}
+
+.routine-metrics span {
+  color: var(--recovery-sand);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.routine-metrics em {
+  margin-left: auto;
+  color: var(--recovery-bd-muted);
+  font-style: normal;
+  font-size: 12px;
+}
+
+.start-last {
+  min-height: 44px;
+  max-height: 48px;
+}
+
+.more-tools {
+  margin-top: 18px;
+  border-top: 1px solid var(--recovery-bd-border);
+  padding-top: 8px;
+}
+
+.more-tools summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--recovery-bd-muted);
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+
+.more-tools summary::-webkit-details-marker { display: none; }
+
+.more-tools-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.log-set-btn {
+  width: 48px;
+  height: 44px;
+  min-height: 44px;
+  max-height: 48px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.workout-input {
+  min-height: 44px;
+  height: 44px;
+}
+
+.lift-recovery a:focus-visible,
+.lift-recovery button:focus-visible,
+.lift-recovery input:focus-visible,
+.lift-recovery select:focus-visible,
+.lift-recovery textarea:focus-visible,
+.lift-recovery summary:focus-visible {
+  outline: 2px solid var(--recovery-bd-text);
+  outline-offset: 2px;
+}
+
+/* No permanent left rail: product stays a single centered column. */
+.lift-rail,
+aside.suite-rail,
+.permanent-left-rail { display: none; }
+
+/* 390×844 — phone portrait */
+@media (max-width: 390px) {
+  .content { padding: 12px; }
+  .more-tools-actions { grid-template-columns: 1fr; }
+  .workout-set-grid {
+    grid-template-columns: 22px minmax(0, 1fr) 60px 52px 44px;
+  }
+}
+
+/* 768×1024 — old iPad portrait */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .screen { width: min(100%, 720px); }
+}
+
+/* 1024×768 — old iPad landscape */
+@media (min-width: 1024px) {
+  .screen { width: min(100%, 760px); }
+}
+
+/* 820×1180 / 1180×820 — iPad Air */
+@media (min-width: 820px) {
+  .content { padding: 16px 20px 28px; }
+}
+
+@media (min-width: 1180px) {
+  .screen { width: min(100%, 800px); }
+}
+
+/* 1440×900 — desktop */
+@media (min-width: 1440px) {
+  .screen { width: min(100%, 820px); }
+}

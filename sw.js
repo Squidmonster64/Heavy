@@ -1,4 +1,4 @@
-const CACHE = 'lift-log-suite-recovery-v1';
+const CACHE = 'lift-log-suite-recovery-v2';
 const ASSETS = ['./', './index.html', './styles.css', './lift-recovery.css', './app.js', './db.js', './exercises.js', './manifest.webmanifest', './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', event => {

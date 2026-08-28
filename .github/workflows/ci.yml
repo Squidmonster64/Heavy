@@ -21,4 +21,4 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Verify
-        run: node --check app.js && node --check db.js && node --check exercises.js && node --check sw.js
+        run: node --check app.js && node --check db.js && node --check exercises.js && node --check sw.js && npm test

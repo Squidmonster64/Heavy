@@ -158,7 +158,7 @@ aside.suite-rail,
   .content { padding: 12px; }
   .more-tools-actions { grid-template-columns: 1fr; }
   .workout-set-grid {
-    grid-template-columns: 22px minmax(0, 1fr) 60px 52px 44px;
+    grid-template-columns: 22px minmax(0, 1fr) 56px 48px 44px 18px;
   }
 }
 

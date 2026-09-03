@@ -2,9 +2,10 @@
   "name": "heavy-workout-logger",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "serve . -l tcp://0.0.0.0:$PORT",
-    "test": "node --test suite-nav.test.mjs lift-recovery.test.mjs"
+    "test": "node --test suite-nav.test.mjs lift-recovery.test.mjs workout-sets.test.mjs"
   },
   "dependencies": {
     "serve": "^14.2.4"

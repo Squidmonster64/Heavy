@@ -185,10 +185,10 @@ aside.suite-rail,
   .more-tools-actions { grid-template-columns: 1fr; }
   .topbar { gap: 8px; padding-left: 10px; padding-right: 10px; }
   .workout-set-grid {
-    grid-template-columns: 20px minmax(0, 1fr) 52px 44px 40px 16px;
+    grid-template-columns: 20px minmax(0, 1fr) 52px 44px 40px 28px;
     padding-left: 6px;
     padding-right: 6px;
-    gap: 4px;
+    gap: 6px;
   }
   .log-set-btn, .complete-btn { width: 40px; }
 }

@@ -57,3 +57,10 @@ test('viewport gates keep a single column with no horizontal overflow', () => {
   assert.match(css, /@media \(min-width: 1180px\)/);
   assert.match(css, /@media \(min-width: 1440px\)/);
 });
+
+test('iOS import keeps the file input alive and accepts Dropbox JSON downloads', () => {
+  assert.match(js, /input\.accept = '\.json,application\/json,application\/octet-stream,text\/plain'/);
+  assert.match(js, /document\.body\.append\(input\);[\s\S]*input\.click\(\);/);
+  assert.match(js, /Import complete: \$\{result\.routineCount\} routine/);
+  assert.match(js, /return \{ routineCount: importedRoutineIds\.size, sessionCount: importedSessionCount \};/);
+});

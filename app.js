@@ -1106,19 +1106,27 @@ async function exportRoutines(routineIds) {
 function importFromFile(encryptedOnly = false) {
   const input = document.createElement('input');
   input.type = 'file';
-  input.accept = 'application/json,.json';
+  input.accept = '.json,application/json,application/octet-stream,text/plain';
+  input.style.cssText = 'position:fixed;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none';
+  const cleanup = () => input.remove();
   input.addEventListener('change', async () => {
     const file = input.files?.[0];
-    if (!file) return;
+    if (!file) return cleanup();
+    showToast(`Reading ${file.name}…`);
     try {
       const text = await file.text();
       let envelope = JSON.parse(text);
       if (encryptedOnly || envelope?.format === 'bloody-daves/encrypted-lift-log-backup/v1') envelope = await decryptBackup(envelope);
-      await importEnvelope(envelope);
+      const result = await importEnvelope(envelope);
+      alert(`Import complete: ${result.routineCount} routine${result.routineCount === 1 ? '' : 's'} and ${result.sessionCount} retained session${result.sessionCount === 1 ? '' : 's'} loaded.`);
     } catch (error) {
       alert(`Import failed: ${error?.message || 'Invalid file.'}`);
+    } finally {
+      cleanup();
     }
-  });
+  }, { once: true });
+  input.addEventListener('cancel', cleanup, { once: true });
+  document.body.append(input);
   input.click();
 }
 
@@ -1153,6 +1161,7 @@ async function importEnvelope(envelope) {
   }
 
   const importedRoutineIds = new Map();
+  let importedSessionCount = 0;
   for (const source of envelope.routines) {
     const existing = state.routines.find(routine => normalise(routine.name) === normalise(source.name));
     let targetId = source.id || crypto.randomUUID();
@@ -1207,6 +1216,7 @@ async function importEnvelope(envelope) {
           exerciseId: exerciseIdMap.get(exercise.exerciseId) || exercise.exerciseId
         }));
         await putOne(STORES.workoutSessions, copy);
+        importedSessionCount += 1;
       }
     }
   }
@@ -1218,6 +1228,7 @@ async function importEnvelope(envelope) {
   state.view = 'routines';
   showToast('Import complete.');
   render();
+  return { routineCount: importedRoutineIds.size, sessionCount: importedSessionCount };
 }
 
 function validateImportEnvelope(envelope) {

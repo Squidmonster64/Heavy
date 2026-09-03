@@ -40,11 +40,16 @@ test('logging controls stay touch-safe at 40–48px and numbers lead decoration'
   assert.match(css, /\.workout-input \{[\s\S]*min-height: 44px;/);
   assert.match(styles, /\.btn \{[^}]*min-height: 44px;[^}]*max-height: 48px;/);
   assert.match(js, /Start last ·/);
+  assert.match(styles, /\.workout-set-grid \{[^}]*grid-template-columns:[^}]*48px 30px;/);
+  assert.match(styles, /\.remove-set-btn \{[^}]*position: static;/);
+  assert.match(js, /if \(!confirm\(`Remove set \$\{index \+ 1\} from \$\{exercise\.exerciseName\}\?`\)\) return;/);
 });
 
 test('viewport gates keep a single column with no horizontal overflow', () => {
   assert.match(css, /Viewport gates: 390×844, 768×1024, 1024×768, 820×1180, 1180×820, 1440×900/);
   assert.match(css, /overflow-x: hidden/);
+  assert.match(css, /\.workout-set-grid > \* \{[\s\S]*min-width: 0;/);
+  assert.match(css, /input\[type='number'\]/);
   assert.match(css, /@media \(max-width: 390px\)/);
   assert.match(css, /@media \(min-width: 768px\) and \(max-width: 1024px\)/);
   assert.match(css, /@media \(min-width: 1024px\)/);

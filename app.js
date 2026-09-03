@@ -1,5 +1,6 @@
 import { STORES, getAll, getOne, putOne, putMany, deleteOne, clearStore } from './db.js';
 import { seedExercises, normalise } from './exercises.js';
+import { carryWorkoutWeightForward } from './workout-sets.js';
 
 const app = document.querySelector('#app');
 const toast = document.querySelector('#toast');
@@ -793,7 +794,7 @@ function renderWorkoutExercise(exercise, nextSetId, labelPrefix = '') {
   return `
     <section class="workout-exercise card ${labelPrefix ? 'inside-superset' : ''}">
       <div class="workout-exercise-head"><div><h2>${labelPrefix ? `<span class="superset-prefix">${escapeHtml(labelPrefix)}</span> ` : ''}${escapeHtml(exercise.exerciseName)}</h2>${exercise.notes ? `<p>${escapeHtml(exercise.notes)}</p>` : ''}</div><button class="mini-btn" data-action="add-workout-set" data-id="${exercise.id}">＋ Set</button></div>
-      <div class="workout-set-grid workout-set-head"><span>Set</span><span>Prev</span><span>kg</span><span>Reps</span><span>Log</span></div>
+      <div class="workout-set-grid workout-set-head"><span>Set</span><span>Prev</span><span>kg</span><span>Reps</span><span>Log</span><span></span></div>
       ${exercise.sets.map((set, setIndex) => `
         <div class="workout-set-grid ${set.isCompleted ? 'completed' : ''} ${set.id === nextSetId ? 'next-set' : ''}" data-set-id="${set.id}">
           <span class="set-number">${setIndex + 1}</span>
@@ -894,9 +895,18 @@ function renderWorkout() {
 
 function bindWorkoutInputs() {
   app.querySelectorAll('[data-workout-weight]').forEach(input => input.addEventListener('input', event => {
-    const set = findWorkoutSet(event.target.dataset.workoutWeight);
-    if (!set) return;
-    set.weightKg = clampNumber(event.target.value, 0, 999.9);
+    const changedSetIds = carryWorkoutWeightForward(
+      state.activeWorkout?.exercises,
+      event.target.dataset.workoutWeight,
+      clampNumber(event.target.value, 0, 999.9)
+    );
+    if (!changedSetIds.length) return;
+    const changedFollowers = new Set(changedSetIds.slice(1));
+    app.querySelectorAll('[data-workout-weight]').forEach(weightInput => {
+      if (!changedFollowers.has(weightInput.dataset.workoutWeight)) return;
+      const changedSet = findWorkoutSet(weightInput.dataset.workoutWeight);
+      if (changedSet) weightInput.value = formatNumber(changedSet.weightKg);
+    });
     queueActiveSave();
   }));
   app.querySelectorAll('[data-workout-reps]').forEach(input => input.addEventListener('input', event => {
@@ -948,7 +958,7 @@ async function removeWorkoutSet(setId) {
   for (const exercise of state.activeWorkout.exercises) {
     const index = exercise.sets.findIndex(item => item.id === setId);
     if (index < 0) continue;
-    if (exercise.sets[index].isCompleted && !confirm('Remove this completed set?')) return;
+    if (!confirm(`Remove set ${index + 1} from ${exercise.exerciseName}?`)) return;
     exercise.sets.splice(index, 1);
     exercise.sets.forEach((set, i) => set.setNumber = i + 1);
     await saveActiveWorkout();

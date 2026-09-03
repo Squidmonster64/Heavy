@@ -1,5 +1,5 @@
-const CACHE = 'lift-log-suite-recovery-v1';
-const ASSETS = ['./', './index.html', './styles.css', './lift-recovery.css', './app.js', './db.js', './exercises.js', './manifest.webmanifest', './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png'];
+const CACHE = 'lift-log-suite-recovery-v3';
+const ASSETS = ['./', './index.html', './styles.css', './lift-recovery.css', './app.js', './workout-sets.js', './db.js', './exercises.js', './manifest.webmanifest', './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));

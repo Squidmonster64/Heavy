@@ -3,7 +3,7 @@ import { addDays, dateKeyFromStored, parseAthleteDate, todayAthleteDateKey } fro
 import { testIntervalsConnection } from "../lib/intervals/test";
 import { pullActuals, pushPlan } from "../lib/intervals/sync";
 import { encodeWatchletic } from "../lib/export/watchletic";
-import { parseStructure } from "../lib/validation/structures";
+import { runStructureSchema } from "../lib/validation/structures";
 
 async function log(status: "ok" | "error", detail: string) {
   try {
@@ -44,7 +44,7 @@ async function main() {
   });
 
   if (runSession) {
-    const structure = parseStructure("RUN", runSession.plannedStructure);
+    const structure = runStructureSchema.parse(runSession.plannedStructure);
     const encoded = encodeWatchletic(structure, { name: runSession.templateName || "Training Hub Run" });
     const exportOk = encoded.url.startsWith("https://watchletic.com/w/") && !encoded.base64.includes("/");
     console.log(`[alpha] Watchletic export ${exportOk ? "OK" : "FAILED"} for ${dateKeyFromStored(runSession.date)}`);
